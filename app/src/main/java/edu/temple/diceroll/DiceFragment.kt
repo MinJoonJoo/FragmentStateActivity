@@ -13,6 +13,8 @@ const val DIE_SIDES = "dIcE_SiDeS"
 
 class DiceFragment : Fragment() {
     private var sides: Int? = null
+    private var currentDiceValue: Int? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,11 +31,25 @@ class DiceFragment : Fragment() {
 
             val numberDisplayTextView = findViewById<TextView>(R.id.numberDisplay)
             findViewById<Button>(R.id.rollButton).setOnClickListener {
-                numberDisplayTextView.text = (Random.nextInt(sides!!) + 1).toString()
+                val diceValue = Random.nextInt(1, sides?.plus(1) ?: 1)
+                currentDiceValue = diceValue
+                numberDisplayTextView.text = diceValue.toString()
             }
         }
     }
-
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        currentDiceValue?.let {
+            outState.putInt("CURRENT_DICE_VALUE", it)
+        }
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        savedInstanceState?.getInt("CURRENT_DICE_VALUE")?.let { restoredValue ->
+            view.findViewById<TextView>(R.id.numberDisplay).text = restoredValue.toString()
+            currentDiceValue = restoredValue
+        }
+    }
     companion object {
 
         @JvmStatic
